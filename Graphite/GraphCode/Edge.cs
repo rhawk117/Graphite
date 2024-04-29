@@ -8,14 +8,16 @@ namespace Graphite.GraphCode
 {
     public class Edge<T>
     {
-        public Vertex<T> From { get; set; }
-        public Vertex<T> To { get; set; }
+        public Node<T> From { get; set; }
+        public Node<T> To { get; set; }
         public double Weight { get; set; }
 
-        public Edge(Vertex<T> aNode, Vertex<T> otherNode, double aWeight = 1)
+        public Edge(Node<T> aNode, Node<T> otherNode, double aWeight = 1)
         {
             if (aNode == null || otherNode == null)
+            {
                 throw new ArgumentNullException("Edge created with a null node");
+            }
 
             From = aNode;
             To = otherNode;

@@ -12,17 +12,17 @@ namespace Graphite.GraphCode
     {
         private bool Directional = false;
 
-        private List<Vertex<T>> _mNodes;
+        private List<Node<T>> _mNodes;
 
         // typically read-only but need to use for dijkstra's class
-        public List<Vertex<T>> Vertices
+        public List<Node<T>> Nodes
         {
             get => _mNodes;
         }
 
         public int Count
         {
-            get => Vertices.Count;
+            get => Nodes.Count;
         }
 
 
@@ -34,16 +34,16 @@ namespace Graphite.GraphCode
             {
                 size = 20;
             }
-            _mNodes = new List<Vertex<T>>(size);
+            _mNodes = new List<Node<T>>(size);
         }
 
         public void RemoveEdge(T source, T dest)
         {
             // get src and dest
-            Vertex<T> sourceNode = _mNodes.
+            Node<T> sourceNode = _mNodes.
                                     Find(g => g.Data.Equals(source));
 
-            Vertex<T> destinationNode = _mNodes.
+            Node<T> destinationNode = _mNodes.
                                         Find(g => g.Data.Equals(dest));
 
             for (int i = 0; i < sourceNode.OutEdges.Count; i++)
@@ -67,6 +67,7 @@ namespace Graphite.GraphCode
                         sourceNode.InEdges.RemoveAt(i);
                     }
                 }
+
                 for (int i = 0; i < destinationNode.OutEdges.Count; i++)
                 {
                     if (destinationNode.OutEdges[i].From.Data.Equals(dest) &&
@@ -76,6 +77,7 @@ namespace Graphite.GraphCode
                         destinationNode.OutEdges.RemoveAt(i);
                     }
                 }
+
                 for (int i = 0; i < destinationNode.InEdges.Count; i++)
                 {
                     if (destinationNode.InEdges[i].From.Data.Equals(source) &&
@@ -102,10 +104,10 @@ namespace Graphite.GraphCode
             }
 
             // add dest to source's adjacency list
-            Vertex<T> sourceNode = _mNodes
+            Node<T> sourceNode = _mNodes
                                     .Find(g => g.Data.Equals(source) == true);
 
-            Vertex<T> destinationNode = _mNodes
+            Node<T> destinationNode = _mNodes
                                         .Find(g => g.Data.Equals(dest) == true);
 
             if (sourceNode != null && destinationNode != null)
@@ -114,7 +116,8 @@ namespace Graphite.GraphCode
                 sourceNode.OutEdges.Add(newEdge);
                 destinationNode.InEdges.Add(newEdge);
 
-                if (Directional == false)  // if bidirectional, add to source's incoming and destination's outgoing edges
+                // if bidirectional, add to source's incoming and destination's outgoing edges
+                if (Directional == false)
                 {
                     Edge<T> otherDirectionEdge = new Edge<T>(destinationNode, sourceNode, aWeight);
                     sourceNode.InEdges.Add(otherDirectionEdge);
@@ -128,7 +131,7 @@ namespace Graphite.GraphCode
             // Don't add if already in Graph
             if (_mNodes.Find(g => g.Data.CompareTo(value) == 0) == null)
             {
-                _mNodes.Add(new Vertex<T>(value));
+                _mNodes.Add(new Node<T>(value));
                 return true;
             }
             else
@@ -136,7 +139,7 @@ namespace Graphite.GraphCode
                 return false;
             }
         }
-        public bool RemoveNode(Vertex<T> aVertex)
+        public bool RemoveNode(Node<T> aVertex)
         {
             if (aVertex == null || _mNodes.FindIndex(tmp => tmp == aVertex) == -1)
             {
@@ -158,7 +161,7 @@ namespace Graphite.GraphCode
 
         public bool RemoveNode(T value)
         {
-            Vertex<T> pDel = _mNodes.Find(g => g.Data.CompareTo(value) == 0);
+            Node<T> pDel = _mNodes.Find(g => g.Data.CompareTo(value) == 0);
             if (pDel != null)
             {
                 for (int j = 0; j < pDel.OutEdges.Count; j++)
@@ -182,7 +185,7 @@ namespace Graphite.GraphCode
         public bool TryFind(ref T value)
         {
             T tmpValue = value;
-            Vertex<T> tmp = _mNodes.Find(g => g.Data.CompareTo(tmpValue) == 0);
+            Node<T> tmp = _mNodes.Find(g => g.Data.CompareTo(tmpValue) == 0);
             if (tmp == null)
             {
                 return false;
@@ -193,15 +196,13 @@ namespace Graphite.GraphCode
                 return true;
             }
         }
-        public bool IsEmpty() => Vertices.Count == 0;
-
-
+        public bool IsEmpty() => Nodes.Count == 0;
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (Vertex<T> vertices in _mNodes)
+            foreach (Node<T> vertices in _mNodes)
             {
                 sb.Append("Node: " + vertices);
                 if (vertices.OutEdges.Count != 0)
@@ -226,17 +227,17 @@ namespace Graphite.GraphCode
                 return;
             }
 
-            foreach (Vertex<T> vertex in _mNodes)
+            foreach (Node<T> vertex in _mNodes)
             {
                 Console.WriteLine($"*---------------({vertex.Data})---------------*");
                 VertexDetails(vertex);
             }
         }
 
-        private void VertexDetails(Vertex<T> vertice)
+        private void VertexDetails(Node<T> vertice)
         {
             Console.WriteLine($"[o] Num. of Outgoing Edges = {vertice.OutEdges.Count} [o]");
-            Console.WriteLine("<guide> - (FROM) ---[weight]---> (TO)");
+            Console.WriteLine("<format> - (FROM) ---[weight]---> (TO)");
 
             foreach (Edge<T> edge in vertice.OutEdges)
             {
@@ -256,6 +257,72 @@ namespace Graphite.GraphCode
                 Utils.awaitEnter();
             }
             Utils.Line();
+        }
+        public void GetTopologicalSorts()
+        {
+            HashSet<T> visited = new HashSet<T>();
+            Stack<T> stack = new Stack<T>();
+            List<List<T>> allSorts = new List<List<T>>();
+
+            // Helper method for DFS-based topological sort
+            void AllTopoSortsDFS(Node<T> vertex)
+            {
+                visited.Add(vertex.Data);
+                stack.Push(vertex.Data);
+
+                // Explore each adjacent vertex
+                foreach (var edge in vertex.OutEdges)
+                {
+                    if (!visited.Contains(edge.To.Data))
+                    {
+                        AllTopoSortsDFS(edge.To);
+                    }
+                }
+
+                // If all vertices are visited, we have a complete sort
+                if (visited.Count == Nodes.Count)
+                {
+                    allSorts.Add(new List<T>(stack.Reverse()));
+                }
+
+                // Backtrack
+                stack.Pop();
+                visited.Remove(vertex.Data);
+            }
+
+            // Initial call to the recursive function for all
+            // vertices not in a cycle
+            foreach (var vertex in Nodes)
+            {
+                if (!visited.Contains(vertex.Data))
+                {
+                    AllTopoSortsDFS(vertex);
+                }
+            }
+
+            // Displaying all topological sorts
+            foreach (var sort in allSorts)
+            {
+                Console.WriteLine(string.Join(" -> ", sort));
+            }
+        }
+
+        public string DisplayVertices()
+        {
+            if (Nodes.Count == 0)
+            {
+                return "[ NO VERTICES ]";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"Num. Vertices => {Nodes.Count}");
+            foreach (Node<T> vertex in Nodes)
+            {
+                sb.Append($" ({vertex.Data}) ");
+            }
+            return sb.ToString();
+
+
         }
 
     }

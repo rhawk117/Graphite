@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spectre.Console;
 
 namespace Graphite.GraphCode
 {
@@ -8,40 +9,43 @@ namespace Graphite.GraphCode
     {
         private OurGraph<T> _graph;
 
-        private Dictionary<Vertex<T>, int> _distance;
+        private Dictionary<Node<T>, int> _distance;
 
-        private Dictionary<Vertex<T>, Vertex<T>> _predecessor;
+        private Dictionary<Node<T>, Node<T>> _predecessor;
 
-        private Vertex<T> _currentNode;
+        private Node<T> _currentNode;
 
         public Dijkstra(OurGraph<T> graph)
         {
             _graph = graph;
-            _distance = new Dictionary<Vertex<T>, int>();
-            _predecessor = new Dictionary<Vertex<T>, Vertex<T>>();
+            _distance = new Dictionary<Node<T>, int>();
+            _predecessor = new Dictionary<Node<T>, Node<T>>();
         }
 
         public void Run(T startNode)
         {
-            Vertex<T> source = _graph.Vertices.Find(v => v.Data.Equals(startNode));
+            Node<T> source = _graph.Nodes.Find(v => v.Data.Equals(startNode));
+
             if (source == null)
             {
-                throw new ArgumentException($"Node {startNode} not found in the graph.");
+                throw new ArgumentException($"[!] Node {startNode} not found in the graph.");
             }
 
-            InitializeSingleSource(source);
+            factoryDefaults(source);
 
-            List<Vertex<T>> unvisitedNodes = new List<Vertex<T>>(_graph.Vertices);
+            List<Node<T>> unvisitedNodes = new List<Node<T>>(_graph.Nodes);
 
             while (unvisitedNodes.Count > 0)
             {
-                _currentNode = FindMinDistance(unvisitedNodes);
+                _currentNode = minDistance(unvisitedNodes);
                 unvisitedNodes.Remove(_currentNode);
 
                 foreach (Edge<T> edge in _currentNode.OutEdges)
                 {
-                    Vertex<T> v = edge.To;
+                    Node<T> v = edge.To;
+
                     int weight = (int)edge.Weight;
+
                     int distanceThroughU = _distance[_currentNode] + weight;
 
                     if (!_distance.ContainsKey(v) || distanceThroughU < _distance[v])
@@ -69,34 +73,58 @@ namespace Graphite.GraphCode
 
         private void RenderTable()
         {
-            int maxVertexLength = _graph.Vertices
-                                        .Max(v => v.Data.ToString().Length);
-            int vertexPadding = maxVertexLength + 2;
+            var table = new Table();
 
-            Console.WriteLine("{0,-" + vertexPadding + "} {1,10} {2,-" + vertexPadding + "}", "Vertex", "Distance", "Predecessor");
-            Console.WriteLine(new string('-', vertexPadding * 2 + 20));
+            // Configure the table with columns
+            table.AddColumn("Vertex");
+            table.AddColumn("Distance(dv)");
+            table.AddColumn("Predecessor(pv)");
 
-            foreach (Vertex<T> vertex in _graph.Vertices)
+            // Set the table border and alignment
+            table.Border(TableBorder.Rounded);
+            table.Alignment = Justify.Center;
+            table.Expand();
+
+            // Adding rows to the table
+            foreach (Node<T> vertex in _graph.Nodes)
             {
-                T predecessorData = GetPredecessorData(vertex);
-                string vertexLine = String.Format("{0,-" + vertexPadding + "} {1,10} {2,-" + vertexPadding + "}", vertex.Data, _distance[vertex], predecessorData);
+                var predecessorData = GetPredecessorData(vertex);
+                var distanceDisplay = _distance.ContainsKey(vertex) ? _distance[vertex].ToString() : "∞";
+                var predecessorDisplay = predecessorData != null ? predecessorData.ToString() : "None";
 
+                // Check if the current vertex is the current node
                 if (vertex.Equals(_currentNode))
                 {
-                    Console.BackgroundColor = ConsoleColor.Yellow;
-                    Console.ForegroundColor = ConsoleColor.Black;
+                    // Highlight the current node with specific styles using markup
+                    table.AddRow(
+                        $"[bold underline yellow on black]{vertex.Data}[/]",
+                        $"[bold underline yellow on black]{distanceDisplay}[/]",
+                        $"[bold underline yellow on black]{predecessorDisplay}[/]"
+                    );
                 }
-                Console.WriteLine(vertexLine);
-                Console.ResetColor();
+                else
+                {
+                    table.AddRow(
+                        vertex.Data.ToString(),
+                        distanceDisplay,
+                        predecessorDisplay
+                    );
+                }
             }
+
+            // Render the table to the console
+            AnsiConsole.Write(table);
         }
 
-        private Vertex<T> FindMinDistance(List<Vertex<T>> unvisitedNodes)
+
+
+
+        private Node<T> minDistance(List<Node<T>> unvisitedNodes)
         {
-            Vertex<T> minNode = null;
+            Node<T> minNode = null;
             int minDistance = int.MaxValue;
 
-            foreach (Vertex<T> node in unvisitedNodes)
+            foreach (Node<T> node in unvisitedNodes)
             {
                 if (_distance[node] < minDistance)
                 {
@@ -107,9 +135,9 @@ namespace Graphite.GraphCode
             return minNode;
         }
 
-        private void InitializeSingleSource(Vertex<T> source)
+        private void factoryDefaults(Node<T> source)
         {
-            foreach (Vertex<T> vertex in _graph.Vertices)
+            foreach (Node<T> vertex in _graph.Nodes)
             {
                 _distance[vertex] = int.MaxValue;
                 _predecessor[vertex] = default;
@@ -118,7 +146,7 @@ namespace Graphite.GraphCode
             _distance[source] = 0;
         }
 
-        private T GetPredecessorData(Vertex<T> vertex)
+        private T GetPredecessorData(Node<T> vertex)
         {
             if (_predecessor[vertex] != null && _predecessor.ContainsKey(vertex))
             {

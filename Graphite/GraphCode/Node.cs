@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Graphite.GraphCode
 {
-    public class Vertex<T>
+    public class Node<T>
     {
         public T Data { get; set; }
         public List<Edge<T>> InEdges;
         public List<Edge<T>> OutEdges;
 
-        public Vertex(T value)
+        public Node(T value)
         {
             Data = value;
             InEdges = new List<Edge<T>>();
@@ -60,7 +60,7 @@ namespace Graphite.GraphCode
                 return false;
             }
             // If parameter cannot be cast to Point return false.
-            Vertex<T> otherNode = obj as Vertex<T>;
+            Node<T> otherNode = obj as Node<T>;
             if ((System.Object)otherNode == null)
             {
                 return false;
@@ -70,7 +70,7 @@ namespace Graphite.GraphCode
                 return this.Equals(otherNode);
             }
         }
-        public bool Equals(Vertex<T> otherNode)
+        public bool Equals(Node<T> otherNode)
         {
             // If parameter is null return false:
             if ((object)otherNode == null)

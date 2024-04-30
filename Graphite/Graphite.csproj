@@ -61,8 +61,11 @@
   <ItemGroup>
     <Compile Include="Dijkstras.cs" />
     <Compile Include="GraphCode\Edge.cs" />
-    <Compile Include="GraphCode\Vertex.cs" />
+    <Compile Include="GraphCode\Node.cs" />
     <Compile Include="GraphCode\OurGraph.cs" />
+    <Compile Include="Menu\ConsoleMenu.cs" />
+    <Compile Include="Menu\GenerateMenus.cs" />
+    <Compile Include="Menu\GraphUI.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

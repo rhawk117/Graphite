@@ -157,7 +157,6 @@ namespace Graphite.GraphCode
                 return default;
             }
         }
-
         private void FinalResult()
         {
             Console.Clear();

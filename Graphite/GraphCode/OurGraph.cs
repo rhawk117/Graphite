@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Spectre.Console;
+
+
 
 namespace Graphite.GraphCode
 {
@@ -321,9 +324,106 @@ namespace Graphite.GraphCode
                 sb.Append($" ({vertex.Data}) ");
             }
             return sb.ToString();
-
-
         }
+
+        public void DisplayGraphTable()
+        {
+            var table = new Table();
+
+            // Add columns to the table for the node, outgoing edges, and incoming edges
+            table.AddColumn(new TableColumn("[u]Node[/]").Centered());
+            table.AddColumn(new TableColumn("[u]Outgoing Edges (To:Weight)[/]").Centered());
+            table.AddColumn(new TableColumn("[u]Incoming Edges (From:Weight)[/]").Centered());
+
+            foreach (Node<T> node in _mNodes)
+            {
+                // Prepare the outgoing edges string
+                var outgoing = node.OutEdges.Count > 0
+                    ? string.Join(", ", node.OutEdges.Select(e => $"{e.To.Data}({e.Weight})"))
+                    : "None";
+
+                // Prepare the incoming edges string
+                var incoming = node.InEdges.Count > 0
+                    ? string.Join(", ", node.InEdges.Select(e => $"{e.From.Data}({e.Weight})"))
+                    : "None";
+
+                // Add a row for each node in the graph
+                table.AddRow(node.Data.ToString(), outgoing, incoming);
+            }
+
+            // Set table design
+            table.Border(TableBorder.Rounded);
+            table.Title("[[ Graph Nodes Overview ]]");
+            table.Caption("Displayed are the nodes and their corresponding edges in the graph.");
+
+            // Render the table to the console
+            AnsiConsole.Write(table);
+        }
+
+        public List<string> Values()
+        {
+            var values = new List<string>();
+            foreach (Node<T> vertex in _mNodes)
+            {
+                values.Add(vertex.Data.ToString());
+            }
+            return values;
+        }
+
+        public IEnumerable<List<T>> GetAllTopologicalSorts()
+        {
+            var visited = new HashSet<Node<T>>();
+            var stack = new Stack<Node<T>>();
+            var result = new List<List<T>>();
+
+            foreach (var node in Nodes)
+            {
+                if (!visited.Contains(node))
+                {
+                    if (!TopologicalSort(node, visited, stack, result))
+                    {
+                        // If the graph contains a cycle, clear the result list and return
+                        result.Clear();
+                        return result;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private bool TopologicalSort(Node<T> node, HashSet<Node<T>> visited, Stack<Node<T>> stack, List<List<T>> result)
+        {
+            visited.Add(node);
+            stack.Push(node);
+
+            foreach (var edge in node.OutEdges)
+            {
+                if (!visited.Contains(edge.To))
+                {
+                    if (!TopologicalSort(edge.To, visited, stack, result))
+                    {
+                        return false;
+                    }
+                }
+                else if (stack.Contains(edge.To))
+                {
+                    // Cycle detected
+                    return false;
+                }
+            }
+
+            var sortedNodes = new List<T>();
+            while (stack.Count > 0)
+            {
+                var n = stack.Pop();
+                sortedNodes.Add(n.Data);
+            }
+
+            result.Add(sortedNodes);
+            return true;
+        }
+
 
     }
 

@@ -1,9 +1,6 @@
 ﻿using Graphite.GraphCode;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Graphite.Menu
 {
@@ -14,31 +11,25 @@ namespace Graphite.Menu
             string prompt = "Select an Option For the Graph";
             List<string> options = new List<string>
             {
-                "Add Node",
-                "Add Edge",
-                "Remove Node",
-                "Remove Edge",
-                "Graph Detials",
-                "Run Dijkstras",
-                "Exit"
+                "Add Node", "Add Edge",
+                "Remove Node", "Remove Edge",
+                "Graph Detials","Run Dijkstras",
+                "Reset Graph","Help", "Exit"
             };
             return new ConsoleMenu(options, prompt);
         }
-
-        public static ConsoleMenu GraphInfo(string prompt, OurGraph<char> aGraph,
-        ConsoleMenu previous = null)
+        public static string Custom(string prompt, List<string> options, bool hasBack = false)
         {
-            var options = aGraph.Values();
-
-            if (previous == null)
+            var menu = new ConsoleMenu(options, prompt);
+            if (hasBack)
             {
-                return new ConsoleMenu(options, prompt);
+                menu.AddBack();
             }
-
-            return new ConsoleMenu(options, prompt, previous);
+            return menu.Run();
         }
 
-        public static ConsoleMenu Details(ConsoleMenu MainMenu)
+        // Graph Detaills
+        public static ConsoleMenu Details()
         {
             string prompt = "Select an option to view for the Graph";
             List<string> options = new List<string>()
@@ -47,27 +38,17 @@ namespace Graphite.Menu
                 "Directed View",
                 "Select a Node to View",
                 "Topological Sorts",
+                "Node Info",
+                "Go Back"
             };
-            return new ConsoleMenu(options, prompt, MainMenu);
-        }
 
+            return new ConsoleMenu(options, prompt);
+        }
+        // Confirm User Choice
         public static bool ConfirmMenu(string prompt)
         {
             var getChoice = new ConsoleMenu(new List<string> { "YES", "NO" }, prompt);
             return getChoice.Run() == "YES";
         }
-    }
-
-
-    public static class Handlers
-    {
-        //"Add Node",
-        //"Add Edge",
-        //"Remove Node",
-        //"Remove Edge",
-        //"Graph Detials",
-        //"Run Dijkstras",
-        //"Exit"
-
     }
 }

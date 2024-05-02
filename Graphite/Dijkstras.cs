@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Spectre.Console;
 
 namespace Graphite.GraphCode
 {
+    // it's not perfect but it works most of the time
     public class Dijkstra<T> where T : IComparable<T>
     {
         private OurGraph<T> _graph;
@@ -54,48 +54,42 @@ namespace Graphite.GraphCode
                         _predecessor[v] = _currentNode;
                     }
                 }
-                DisplayStep();
+                showStep();
             }
-            FinalResult();
+            finalResult();
         }
 
-        private void DisplayStep()
+        private void showStep()
         {
             Console.Clear();
             Console.WriteLine(_graph);
             Console.WriteLine();
-            Console.WriteLine($"Current Node: {_currentNode.Data}");
+            Prompt.Info($"Current Node: {_currentNode.Data}");
             Console.WriteLine("* * * * * * * Table * * * * * * *");
             RenderTable();
-            Console.WriteLine("[ Press ENTER to continue... ]");
-            Console.ReadLine();
+            Prompt.Wait();
         }
 
         private void RenderTable()
         {
-            var table = new Table();
+            Table table = new Table();
 
-            // Configure the table with columns
             table.AddColumn("Vertex");
             table.AddColumn("Distance(dv)");
             table.AddColumn("Predecessor(pv)");
 
-            // Set the table border and alignment
             table.Border(TableBorder.Rounded);
             table.Alignment = Justify.Center;
             table.Expand();
 
-            // Adding rows to the table
             foreach (Node<T> vertex in _graph.Nodes)
             {
-                var predecessorData = GetPredecessorData(vertex);
+                var predecessorData = getPredecessorData(vertex);
                 var distanceDisplay = _distance.ContainsKey(vertex) ? _distance[vertex].ToString() : "∞";
                 var predecessorDisplay = predecessorData != null ? predecessorData.ToString() : "None";
 
-                // Check if the current vertex is the current node
                 if (vertex.Equals(_currentNode))
                 {
-                    // Highlight the current node with specific styles using markup
                     table.AddRow(
                         $"[bold underline yellow on black]{vertex.Data}[/]",
                         $"[bold underline yellow on black]{distanceDisplay}[/]",
@@ -112,7 +106,6 @@ namespace Graphite.GraphCode
                 }
             }
 
-            // Render the table to the console
             AnsiConsole.Write(table);
         }
 
@@ -146,7 +139,7 @@ namespace Graphite.GraphCode
             _distance[source] = 0;
         }
 
-        private T GetPredecessorData(Node<T> vertex)
+        private T getPredecessorData(Node<T> vertex)
         {
             if (_predecessor[vertex] != null && _predecessor.ContainsKey(vertex))
             {
@@ -157,12 +150,12 @@ namespace Graphite.GraphCode
                 return default;
             }
         }
-        private void FinalResult()
+        private void finalResult()
         {
             Console.Clear();
-            Console.WriteLine("\t\t>> Final Result <<");
+            Prompt.Info("\t\t>> Final Result <<");
             RenderTable();
-            Console.ReadLine();
+            Prompt.Wait();
         }
     }
 }

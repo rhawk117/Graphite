@@ -66,6 +66,7 @@
     <Compile Include="Menu\ConsoleMenu.cs" />
     <Compile Include="Menu\GenerateMenus.cs" />
     <Compile Include="Menu\GraphUI.cs" />
+    <Compile Include="Prompt.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using Spectre.Console;
 
 
-
+// Primarily created by Professor Dowell made Dijkstra's and Display methods
 namespace Graphite.GraphCode
 {
     public class OurGraph<T> where T : IComparable<T>
@@ -39,6 +36,18 @@ namespace Graphite.GraphCode
             }
             _mNodes = new List<Node<T>>(size);
         }
+
+        public void Clear()
+        {
+            _mNodes = null;
+            _mNodes = new List<Node<T>>(20);
+        }
+
+        public Node<T> GetNode(string search)
+        {
+            return _mNodes.Find(n => n.Data.Equals(search));
+        }
+
 
         public void RemoveEdge(T source, T dest)
         {
@@ -221,12 +230,12 @@ namespace Graphite.GraphCode
             }
             return sb.ToString();
         }
-
+        // all code below i made ^- above is dowells
         public void DirectedView()
         {
             if (Directional == false)
             {
-                Console.WriteLine("Graph is not directed");
+                Prompt.Error("Graph is not directed");
                 return;
             }
 
@@ -237,15 +246,15 @@ namespace Graphite.GraphCode
             }
         }
 
-        private void VertexDetails(Node<T> vertice)
+        public void VertexDetails(Node<T> vertice)
         {
-            Console.WriteLine($"[o] Num. of Outgoing Edges = {vertice.OutEdges.Count} [o]");
+            Prompt.Info($"[o] Num. of Outgoing Edges = {vertice.OutEdges.Count} [o]");
             Console.WriteLine("<format> - (FROM) ---[weight]---> (TO)");
 
             foreach (Edge<T> edge in vertice.OutEdges)
             {
                 Console.WriteLine($"\n({edge.From.Data}) ---[{edge.Weight}]---> ({edge.To.Data})\n");
-                Utils.awaitEnter();
+                Prompt.Wait();
             }
 
             Utils.Line();
@@ -256,24 +265,29 @@ namespace Graphite.GraphCode
 
             foreach (Edge<T> edge in vertice.InEdges)
             {
-                Console.WriteLine($"\n({edge.To.Data}) <---[{edge.Weight}]--- ({edge.From.Data})\n");
-                Utils.awaitEnter();
+                string weight = edge.Weight.ToString();
+                if (weight == "0")
+                {
+                    weight = "n/a";
+                }
+                Console.WriteLine($"\n({edge.To.Data}) <---[{weight}]--- ({edge.From.Data})\n");
+                Prompt.Wait();
             }
             Utils.Line();
         }
+        // this does not work
         public void GetTopologicalSorts()
         {
             HashSet<T> visited = new HashSet<T>();
             Stack<T> stack = new Stack<T>();
             List<List<T>> allSorts = new List<List<T>>();
 
-            // Helper method for DFS-based topological sort
+            // internal dfs method
             void AllTopoSortsDFS(Node<T> vertex)
             {
                 visited.Add(vertex.Data);
                 stack.Push(vertex.Data);
 
-                // Explore each adjacent vertex
                 foreach (var edge in vertex.OutEdges)
                 {
                     if (!visited.Contains(edge.To.Data))
@@ -282,19 +296,16 @@ namespace Graphite.GraphCode
                     }
                 }
 
-                // If all vertices are visited, we have a complete sort
                 if (visited.Count == Nodes.Count)
                 {
                     allSorts.Add(new List<T>(stack.Reverse()));
                 }
 
-                // Backtrack
                 stack.Pop();
                 visited.Remove(vertex.Data);
             }
 
-            // Initial call to the recursive function for all
-            // vertices not in a cycle
+
             foreach (var vertex in Nodes)
             {
                 if (!visited.Contains(vertex.Data))
@@ -303,22 +314,21 @@ namespace Graphite.GraphCode
                 }
             }
 
-            // Displaying all topological sorts
             foreach (var sort in allSorts)
             {
                 Console.WriteLine(string.Join(" -> ", sort));
             }
         }
 
-        public string DisplayVertices()
+        public string NodeInfo()
         {
             if (Nodes.Count == 0)
             {
-                return "[ NO VERTICES ]";
+                return "[ NO VERTICES / NODES ]";
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Num. Vertices => {Nodes.Count}");
+            sb.Append($"Num. Vertices/Nodes => {Nodes.Count}");
             foreach (Node<T> vertex in Nodes)
             {
                 sb.Append($" ({vertex.Data}) ");
@@ -337,29 +347,24 @@ namespace Graphite.GraphCode
 
             foreach (Node<T> node in _mNodes)
             {
-                // Prepare the outgoing edges string
                 var outgoing = node.OutEdges.Count > 0
                     ? string.Join(", ", node.OutEdges.Select(e => $"{e.To.Data}({e.Weight})"))
                     : "None";
 
-                // Prepare the incoming edges string
                 var incoming = node.InEdges.Count > 0
                     ? string.Join(", ", node.InEdges.Select(e => $"{e.From.Data}({e.Weight})"))
                     : "None";
 
-                // Add a row for each node in the graph
                 table.AddRow(node.Data.ToString(), outgoing, incoming);
             }
 
-            // Set table design
             table.Border(TableBorder.Rounded);
             table.Title("[[ Graph Nodes Overview ]]");
             table.Caption("Displayed are the nodes and their corresponding edges in the graph.");
 
-            // Render the table to the console
             AnsiConsole.Write(table);
         }
-
+        // for UI 
         public List<string> Values()
         {
             var values = new List<string>();
@@ -380,19 +385,18 @@ namespace Graphite.GraphCode
             {
                 if (!visited.Contains(node))
                 {
-                    if (!TopologicalSort(node, visited, stack, result))
+                    if (!isTopologicalSort(node, visited, stack, result))
                     {
-                        // If the graph contains a cycle, clear the result list and return
                         result.Clear();
                         return result;
                     }
                 }
             }
-
             return result;
         }
 
-        private bool TopologicalSort(Node<T> node, HashSet<Node<T>> visited, Stack<Node<T>> stack, List<List<T>> result)
+        private bool isTopologicalSort(Node<T> node, HashSet<Node<T>> visited,
+        Stack<Node<T>> stack, List<List<T>> result)
         {
             visited.Add(node);
             stack.Push(node);
@@ -401,14 +405,13 @@ namespace Graphite.GraphCode
             {
                 if (!visited.Contains(edge.To))
                 {
-                    if (!TopologicalSort(edge.To, visited, stack, result))
+                    if (!isTopologicalSort(edge.To, visited, stack, result))
                     {
                         return false;
                     }
                 }
-                else if (stack.Contains(edge.To))
+                else if (stack.Contains(edge.To)) // cycle
                 {
-                    // Cycle detected
                     return false;
                 }
             }
@@ -423,8 +426,5 @@ namespace Graphite.GraphCode
             result.Add(sortedNodes);
             return true;
         }
-
-
     }
-
 }

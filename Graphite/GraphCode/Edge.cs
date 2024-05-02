@@ -64,5 +64,9 @@ namespace Graphite.GraphCode
         {
             return Weight.GetHashCode() + From.GetHashCode() + To.GetHashCode();
         }
+
+
+
+
     }
 }

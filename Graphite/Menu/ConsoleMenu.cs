@@ -2,51 +2,49 @@
 using System.Collections.Generic;
 using static System.Console;
 
-namespace Graphite.Menu
+namespace Graphite
 {
+    // re-usable menu ui 
     public class ConsoleMenu
     {
         public List<string> Options { get; set; }
-        private string Prompt { get; set; }
+        private string Message { get; set; }
 
         private int highlight;
 
         private ConsoleMenu prevMenu;
-
-        private int Highlight
+        private int Highlight // current index selected or "highlighted" in menu
         {
             get => highlight;
             set
             {
                 if (value < 0)
-                {
                     highlight = Options.Count - 1;
-                }
+
                 else if (value >= Options.Count)
-                {
                     highlight = 0;
-                }
+
                 else
-                {
                     highlight = value;
-                }
             }
         }
+
         public ConsoleMenu(List<string> options, string prompt)
         {
             Options = options;
-            Prompt = prompt;
+            Message = Prompt.Menuify(prompt);
             Highlight = 0;
         }
 
         public ConsoleMenu(List<string> options, string prompt, ConsoleMenu Previous)
         {
             Options = options;
-            Prompt = prompt;
+            Message = Prompt.Menuify(prompt);
             Highlight = 0;
-            Options.Add("Back");
+            Options.Add("Go Back");
             prevMenu = Previous;
         }
+
         public void GoBack()
         {
             if (prevMenu == null)
@@ -56,10 +54,12 @@ namespace Graphite.Menu
             }
             prevMenu.Run();
         }
+        public void AddBack() => Options.Add("Go Back");
+
         private void Show()
         {
             Clear();
-            WriteLine(Prompt);
+            WriteLine(Message);
             for (int i = 0; i < Options.Count; i++)
             {
 
@@ -75,10 +75,11 @@ namespace Graphite.Menu
                     ForegroundColor = ConsoleColor.White;
                     BackgroundColor = ConsoleColor.Black;
                 }
-                WriteLine($"{prefix} [ " + currentOption + " ]");
+                WriteLine($"{prefix} [ {currentOption} ]");
             }
             ResetColor();
         }
+
         public string Run()
         {
             ConsoleKey keyPressed;

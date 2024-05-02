@@ -9,8 +9,8 @@ namespace Graphite.GraphCode
     public class Node<T>
     {
         public T Data { get; set; }
-        public List<Edge<T>> InEdges;
-        public List<Edge<T>> OutEdges;
+        public List<Edge<T>> InEdges; // Edges coming into this node
+        public List<Edge<T>> OutEdges; // Edges going out of this node
 
         public Node(T value)
         {

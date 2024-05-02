@@ -1,4 +1,5 @@
 ﻿using Graphite.GraphCode;
+using Graphite.Menu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,28 @@ namespace Graphite
     internal class Program
     {
         static void Main(string[] args)
+        {
+            // to anyone who is using this repo, project isn't polished yet 
+            // and likely has multiple bugs heads up
+
+            // also dowells graph class is really slow for some reason
+
+            Prompt.Info("\tWelcome to Graphite, loading program...");
+            Utils.DisplayHeader();
+            GraphUI graphUI = new GraphUI();
+            try
+            {
+                graphUI.Run();
+            }
+            catch (Exception ex)
+            {
+                Prompt.ErrorHandler(ex);
+            }
+        }
+
+
+
+        static void dijkstrasTest()
         {
             OurGraph<int> graph = new OurGraph<int>(true);
             graph.AddNode(1);
@@ -51,8 +74,6 @@ namespace Graphite
 
             Dijkstra<int> dijkstra = new Dijkstra<int>(graph);
             dijkstra.Run(1);
-
-
 
         }
     }

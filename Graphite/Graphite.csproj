@@ -59,12 +59,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dijkstras.cs" />
+    <Compile Include="GraphCode\Dijkstras.cs" />
     <Compile Include="GraphCode\Edge.cs" />
     <Compile Include="GraphCode\Node.cs" />
     <Compile Include="GraphCode\OurGraph.cs" />
     <Compile Include="Menu\ConsoleMenu.cs" />
-    <Compile Include="Menu\GenerateMenus.cs" />
+    <Compile Include="Menu\Generator.cs" />
     <Compile Include="Menu\GraphUI.cs" />
     <Compile Include="Prompt.cs" />
     <Compile Include="Utils.cs" />
@@ -74,6 +74,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utilities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

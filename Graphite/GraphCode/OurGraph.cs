@@ -19,13 +19,10 @@ namespace Graphite.GraphCode
         {
             get => _mNodes;
         }
-
         public int Count
         {
             get => Nodes.Count;
         }
-
-
         public OurGraph(bool isDirectional = false, int size = 20)
         {
             Directional = isDirectional;
@@ -36,7 +33,6 @@ namespace Graphite.GraphCode
             }
             _mNodes = new List<Node<T>>(size);
         }
-
         public void Clear()
         {
             _mNodes = null;
@@ -47,7 +43,6 @@ namespace Graphite.GraphCode
         {
             return _mNodes.Find(n => n.Data.Equals(search));
         }
-
 
         public void RemoveEdge(T source, T dest)
         {
@@ -193,7 +188,6 @@ namespace Graphite.GraphCode
         }
 
         public bool Contains(T value) => _mNodes.Find(n => n.Data.CompareTo(value) == 0) == null;
-
         public bool TryFind(ref T value)
         {
             T tmpValue = value;
@@ -209,7 +203,6 @@ namespace Graphite.GraphCode
             }
         }
         public bool IsEmpty() => Nodes.Count == 0;
-
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -230,7 +223,7 @@ namespace Graphite.GraphCode
             }
             return sb.ToString();
         }
-        // all code below i made ^- above is dowells
+        // ^- above is dowells | v- all code below made by me 
         public void DirectedView()
         {
             if (Directional == false)
@@ -274,50 +267,6 @@ namespace Graphite.GraphCode
                 Prompt.Wait();
             }
             Utils.Line();
-        }
-        // this does not work
-        public void GetTopologicalSorts()
-        {
-            HashSet<T> visited = new HashSet<T>();
-            Stack<T> stack = new Stack<T>();
-            List<List<T>> allSorts = new List<List<T>>();
-
-            // internal dfs method
-            void AllTopoSortsDFS(Node<T> vertex)
-            {
-                visited.Add(vertex.Data);
-                stack.Push(vertex.Data);
-
-                foreach (var edge in vertex.OutEdges)
-                {
-                    if (!visited.Contains(edge.To.Data))
-                    {
-                        AllTopoSortsDFS(edge.To);
-                    }
-                }
-
-                if (visited.Count == Nodes.Count)
-                {
-                    allSorts.Add(new List<T>(stack.Reverse()));
-                }
-
-                stack.Pop();
-                visited.Remove(vertex.Data);
-            }
-
-
-            foreach (var vertex in Nodes)
-            {
-                if (!visited.Contains(vertex.Data))
-                {
-                    AllTopoSortsDFS(vertex);
-                }
-            }
-
-            foreach (var sort in allSorts)
-            {
-                Console.WriteLine(string.Join(" -> ", sort));
-            }
         }
 
         public string NodeInfo()
@@ -374,7 +323,6 @@ namespace Graphite.GraphCode
             }
             return values;
         }
-
         public IEnumerable<List<T>> GetAllTopologicalSorts()
         {
             var visited = new HashSet<Node<T>>();

@@ -17,7 +17,7 @@ namespace Graphite
 
             // also dowells graph class is really slow for some reason
 
-            Prompt.Info("\tWelcome to Graphite, loading program...");
+            Prompt.Info("NOTE: Project is still work in progress so it may crash.");
             Utils.DisplayHeader();
             GraphUI graphUI = new GraphUI();
             try
@@ -29,8 +29,6 @@ namespace Graphite
                 Prompt.ErrorHandler(ex);
             }
         }
-
-
 
         static void dijkstrasTest()
         {

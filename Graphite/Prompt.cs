@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
+
 namespace Graphite
 {
     public static class Prompt
@@ -41,11 +41,15 @@ namespace Graphite
         }
         public static void ErrorHandler(Exception ex)
         {
-            Console.WriteLine($"Message\n{ex.Message} [ ! ]\n");
             Utils.Line();
+            Console.WriteLine($"Message\n{ex.Message}\n");
+            Utils.Line();
+            Wait();
             Console.WriteLine($"Traceback {ex.StackTrace}");
             Utils.Line();
+            Wait();
             Console.WriteLine($"Exception Info \n {ex}");
+            Wait();
         }
         public static string Menuify(string menuText)
         {
@@ -53,7 +57,7 @@ namespace Graphite
             menuText = $"{line}\n[ ? ] {menuText} [ ? ]\n{line}";
             return menuText;
         }
-        public static void DelayMsg(string message, int delay)
+        public static void DelayMessage(string message, int delay)
         {
             Info(message);
             Thread.Sleep(delay);

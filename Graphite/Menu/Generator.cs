@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Graphite.Menu
 {
-    public static class GenerateMenus
+    public static class Generator
     {
         public static ConsoleMenu MainMenu()
         {
@@ -18,6 +18,7 @@ namespace Graphite.Menu
             };
             return new ConsoleMenu(options, prompt);
         }
+        // Custom Re-Usable Menu Easy & Clean To Setup
         public static string Custom(string prompt, List<string> options, bool hasBack = false)
         {
             var menu = new ConsoleMenu(options, prompt);

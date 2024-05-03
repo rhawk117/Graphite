@@ -5,11 +5,6 @@ namespace Graphite
 {
     public static class Utils
     {
-        public static void awaitEnter()
-        {
-            Console.WriteLine("[ Press Enter to continue... ]");
-            Console.ReadKey();
-        }
         public static void Line()
         {
             Console.WriteLine("\n===========================================================\n");
@@ -23,15 +18,12 @@ namespace Graphite
             return choice;
         }
 
-        public static void displayList(List<string> aList)
+        public static void InlineGraph(List<string> aList)
         {
-            Console.Write($"[ ");
-
             foreach (string item in aList)
             {
                 Console.Write($"{item},");
             }
-            Console.Write($"]");
         }
 
         public static string EdgeInfo(string from = "?", string to = "?")
@@ -71,12 +63,11 @@ namespace Graphite
                `\//         \/___L\ \/_/ \/__/\/_/ \ \ \/  \/_/\/_/\/_/\/__/\/____/     \//           
                               /\____/               \ \_\                                             
                               \_/__/                 \/_/                                             
-                                    
-
-                                             made by: @rhawk117
-            ===================================================================================    
-                                        [ Press ENTER to continue ]
-            =================================================================================== ");
+            *================================================================================*
+            |                           Graphite - C# Console Graph UI                       |
+            |                                made by: @rhawk117                              |
+            |                             [ Press ENTER to continue ]                        |
+            *================================================================================*");
             Console.ReadKey();
 
         }

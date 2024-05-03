@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Graphite.GraphCode
 {
@@ -64,9 +61,5 @@ namespace Graphite.GraphCode
         {
             return Weight.GetHashCode() + From.GetHashCode() + To.GetHashCode();
         }
-
-
-
-
     }
 }

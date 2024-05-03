@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace Graphite.GraphCode
 {
-    // it's not perfect but it works most of the time
+    // it's not perfect but it works most of the time & is best i could come up with
     public class Dijkstra<T> where T : IComparable<T>
     {
         private OurGraph<T> _graph;
@@ -64,8 +64,7 @@ namespace Graphite.GraphCode
             Console.Clear();
             Console.WriteLine(_graph);
             Console.WriteLine();
-            Prompt.Info($"Current Node: {_currentNode.Data}");
-            Console.WriteLine("* * * * * * * Table * * * * * * *");
+            Prompt.Info($"Current Node => ({_currentNode.Data})");
             RenderTable();
             Prompt.Wait();
         }
@@ -109,9 +108,6 @@ namespace Graphite.GraphCode
             AnsiConsole.Write(table);
         }
 
-
-
-
         private Node<T> minDistance(List<Node<T>> unvisitedNodes)
         {
             Node<T> minNode = null;
@@ -150,6 +146,7 @@ namespace Graphite.GraphCode
                 return default;
             }
         }
+
         private void finalResult()
         {
             Console.Clear();
@@ -157,5 +154,6 @@ namespace Graphite.GraphCode
             RenderTable();
             Prompt.Wait();
         }
+
     }
 }

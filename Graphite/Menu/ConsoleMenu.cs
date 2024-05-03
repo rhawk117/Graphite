@@ -7,63 +7,45 @@ namespace Graphite
     // re-usable menu ui 
     public class ConsoleMenu
     {
-        public List<string> Options { get; set; }
-        private string Message { get; set; }
+        private List<string> menuItems; // menu options 
+
+        private string message; // menu prompt 
 
         private int highlight;
-
-        private ConsoleMenu prevMenu;
         private int Highlight // current index selected or "highlighted" in menu
         {
             get => highlight;
+
             set
             {
                 if (value < 0)
-                    highlight = Options.Count - 1;
+                    highlight = menuItems.Count - 1;
 
-                else if (value >= Options.Count)
+                else if (value >= menuItems.Count)
                     highlight = 0;
 
                 else
                     highlight = value;
             }
         }
+        private const string BACK = "Go Back";
 
         public ConsoleMenu(List<string> options, string prompt)
         {
-            Options = options;
-            Message = Prompt.Menuify(prompt);
+            menuItems = options;
+            message = Prompt.Menuify(prompt);
             Highlight = 0;
         }
 
-        public ConsoleMenu(List<string> options, string prompt, ConsoleMenu Previous)
-        {
-            Options = options;
-            Message = Prompt.Menuify(prompt);
-            Highlight = 0;
-            Options.Add("Go Back");
-            prevMenu = Previous;
-        }
+        public void AddBack() => menuItems.Add(BACK);
 
-        public void GoBack()
-        {
-            if (prevMenu == null)
-            {
-                WriteLine("No previous menu set");
-                return;
-            }
-            prevMenu.Run();
-        }
-        public void AddBack() => Options.Add("Go Back");
-
-        private void Show()
+        private void showOptions()
         {
             Clear();
-            WriteLine(Message);
-            for (int i = 0; i < Options.Count; i++)
+            WriteLine(message);
+            for (int i = 0; i < menuItems.Count; i++)
             {
-
-                string currentOption = Options[i], prefix = "";
+                string currentOption = menuItems[i], prefix = "";
                 if (i == Highlight)
                 {
                     prefix = ">> ";
@@ -86,22 +68,21 @@ namespace Graphite
             do
             {
                 Clear();
-                Show();
-                ConsoleKeyInfo keyInfo = ReadKey(true);
-                keyPressed = keyInfo.Key;
+                showOptions();
+                keyPressed = ReadKey(true).Key;
                 switch (keyPressed)
                 {
                     case ConsoleKey.UpArrow:
                         Highlight--;
                         break;
-
                     case ConsoleKey.DownArrow:
                         Highlight++;
                         break;
                 }
             }
             while (keyPressed != ConsoleKey.Enter);
-            return Options[highlight];
+
+            return menuItems[highlight];
         }
     }
 }
